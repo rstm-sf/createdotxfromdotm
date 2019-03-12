@@ -26,19 +26,18 @@ namespace CreateDotxFromDotm
                     var tableMem = CreateTestDataTable("TestTable");
                     var tableDoc = document.MainDocumentPart.Document.Body.Elements<Table>().FirstOrDefault();
 
+                    var rows = tableDoc.Descendants<TableRow>().ToList();
+                    var myRow = (TableRow)rows.Last().Clone();
+                    rows.Last().Remove();
+
                     for (int i = 0; i < tableMem.Rows.Count; ++i)
                     {
-                        var rowDoc = new TableRow();
-                        var col1Doc = new TableCell(
-                            new Paragraph(
-                                new Run(
-                                    new Text(tableMem.Rows[i]["id"].ToString()))));
-                        var col2Doc = new TableCell(
-                            new Paragraph(
-                                new Run(
-                                    new Text(tableMem.Rows[i]["item"].ToString()))));
-                        rowDoc.Append(col1Doc, col2Doc);
-                        tableDoc.Append(rowDoc);
+                        var rowDoc = (TableRow)myRow.Clone();
+                        var cellsDoc = rowDoc.Descendants<TableCell>().ToList();
+                        for (int j = 0; j < tableMem.Columns.Count; ++j)
+                            cellsDoc[j].Descendants<Text>().FirstOrDefault().Text = tableMem.Rows[i][j].ToString();
+
+                        tableDoc.Descendants<TableRow>().Last().InsertAfterSelf(rowDoc);
                     }
 
                     document.Save();

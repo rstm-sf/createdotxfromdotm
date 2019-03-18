@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Data;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -19,24 +20,12 @@ namespace CreateDocxFromDotx
                 {
                     document.ChangeDocumentType(WordprocessingDocumentType.Document);
 
-                    var tableMem = Utility.CreateTestDataTable("TestTable");
+                    var dataTable = Utility.CreateTestDataTable("TestTable");
                     var docTable = document.MainDocumentPart.Document.Body.Elements<Table>().FirstOrDefault();
 
                     if (docTable != null)
                     {
-                        var rows = docTable.Descendants<TableRow>().ToList();
-                        var myRow = (TableRow)rows.Last().Clone();
-                        rows.Last().Remove();
-
-                        for (var rowIdx = 0; rowIdx < tableMem.Rows.Count; ++rowIdx)
-                        {
-                            var rowDoc = (TableRow)myRow.Clone();
-                            var cellsDoc = rowDoc.Descendants<TableCell>().ToList();
-                            for (var cellIdx = 0; cellIdx < tableMem.Columns.Count; ++cellIdx)
-                                ReplaceText(cellsDoc[cellIdx], tableMem.Rows[rowIdx][cellIdx]);
-
-                            docTable.Descendants<TableRow>().Last().InsertAfterSelf(rowDoc);
-                        }
+                        InsertSimpleTable(dataTable, docTable);
                     }
 
                     document.Save();
@@ -52,6 +41,24 @@ namespace CreateDocxFromDotx
         public void Open()
         {
             Process.Start(_destinationFile);
+        }
+
+        private static void InsertSimpleTable(DataTable dataTable, OpenXmlElement docTable)
+        {
+            var docRows = docTable.Descendants<TableRow>().ToList();
+            var patternRow = (TableRow)docRows.Last().Clone();
+            docRows.Last().Remove();
+
+            for (var rIdx = 0; rIdx < dataTable.Rows.Count; ++rIdx)
+            {
+                var docRow = (TableRow)patternRow.Clone();
+
+                var docCells = docRow.Descendants<TableCell>().ToList();
+                for (var cIdx = 0; cIdx < dataTable.Columns.Count; ++cIdx)
+                    ReplaceText(docCells[cIdx], dataTable.Rows[rIdx][cIdx]);
+
+                docTable.Descendants<TableRow>().ToList().Last().InsertAfterSelf(docRow);
+            }
         }
 
         private static void ReplaceText(OpenXmlElement tCell, object dCell)

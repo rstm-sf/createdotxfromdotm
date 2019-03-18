@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using DocumentFormat.OpenXml;
@@ -27,12 +28,12 @@ namespace CreateDocxFromDotx
                         var myRow = (TableRow)rows.Last().Clone();
                         rows.Last().Remove();
 
-                        for (var i = 0; i < tableMem.Rows.Count; ++i)
+                        for (var rowIdx = 0; rowIdx < tableMem.Rows.Count; ++rowIdx)
                         {
                             var rowDoc = (TableRow)myRow.Clone();
                             var cellsDoc = rowDoc.Descendants<TableCell>().ToList();
-                            for (var j = 0; j < tableMem.Columns.Count; ++j)
-                                cellsDoc[j].Descendants<Text>().FirstOrDefault().Text = tableMem.Rows[i][j].ToString();
+                            for (var cellIdx = 0; cellIdx < tableMem.Columns.Count; ++cellIdx)
+                                ReplaceText(cellsDoc[cellIdx], tableMem.Rows[rowIdx][cellIdx]);
 
                             docTable.Descendants<TableRow>().Last().InsertAfterSelf(rowDoc);
                         }
@@ -46,7 +47,24 @@ namespace CreateDocxFromDotx
             {
                 throw new Exception(e.Message);
             }
+        }
 
+        public void Open()
+        {
+            Process.Start(_destinationFile);
+        }
+
+        private static void ReplaceText(OpenXmlElement tCell, object dCell)
+        {
+            try
+            {
+                var first = tCell.Descendants<Text>().FirstOrDefault();
+                first.Text = dCell.ToString();
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
+            }
         }
 
         private static readonly string SampleFolder = Path.Combine(Environment.CurrentDirectory, "Sample");

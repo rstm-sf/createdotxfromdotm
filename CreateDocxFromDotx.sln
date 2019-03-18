@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.27703.2047
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CreateDotxFromDotm", "CreateDotxFromDotm\CreateDotxFromDotm.csproj", "{3C3AB572-6A3E-4DB8-86C6-3761A33A2A90}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CreateDocxFromDotx", "CreateDocxFromDotx\CreateDocxFromDotx.csproj", "{3C3AB572-6A3E-4DB8-86C6-3761A33A2A90}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

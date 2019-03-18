@@ -1,16 +1,13 @@
 ﻿using System.Reflection;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 // Общие сведения об этой сборке предоставляются следующим набором
 // набора атрибутов. Измените значения этих атрибутов, чтобы изменить сведения,
 // связанные со сборкой.
-[assembly: AssemblyTitle("CreateDotxFromDotm")]
+[assembly: AssemblyTitle("CreateDocxFromDotx")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Hewlett-Packard")]
-[assembly: AssemblyProduct("CreateDotxFromDotm")]
-[assembly: AssemblyCopyright("Copyright © Hewlett-Packard 2019")]
+[assembly: AssemblyProduct("CreateDocxFromDotx")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

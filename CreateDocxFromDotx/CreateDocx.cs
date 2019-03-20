@@ -65,6 +65,9 @@ namespace CreateDocxFromDotx
 
         private static void AddImageToBody(WordprocessingDocument wordDoc, string relationshipId)
         {
+            const long picSizeCx = 990000L + 990000L;
+            const long picSizeCy = picSizeCx;
+
             var pictureProperties = new PIC.NonVisualPictureProperties(
                 new PIC.NonVisualDrawingProperties()
                 {
@@ -95,8 +98,8 @@ namespace CreateDocxFromDotx
                     },
                     new A.Extents()
                     {
-                        Cx = 990000L,
-                        Cy = 792000L
+                        Cx = picSizeCx,
+                        Cy = picSizeCy
                     }),
                 new A.PresetGeometry(new A.AdjustValueList())
                 {
@@ -113,8 +116,8 @@ namespace CreateDocxFromDotx
             var dwInline = new DW.Inline(
                 new DW.Extent()
                 {
-                    Cx = 990000L,
-                    Cy = 792000L
+                    Cx = picSizeCx,
+                    Cy = picSizeCy
                 },
                 new DW.EffectExtent()
                 {

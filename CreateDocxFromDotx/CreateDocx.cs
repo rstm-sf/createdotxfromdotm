@@ -32,6 +32,8 @@ namespace CreateDocxFromDotx
                     InsertSimpleTableWithAddColumn(dataTable, docTables[1]);
 
                     InsertAPicture(document, Path.Combine(SampleFolder, "picture1.jpg"));
+                    InsertAPicture(document, Path.Combine(SampleFolder, "picture1.jpg"));
+                    InsertAPicture(document, Path.Combine(SampleFolder, "picture1.jpg"));
 
                     document.Save();
                     Console.WriteLine("Document generated at " + _destinationFile);
@@ -69,8 +71,7 @@ namespace CreateDocxFromDotx
                     Id = (UInt32Value) 0U,
                     Name = "New Bitmap Image.jpg"
                 },
-                new PIC.NonVisualPictureDrawingProperties()
-            );
+                new PIC.NonVisualPictureDrawingProperties());
 
             var picBlipFill = new PIC.BlipFill(
                 new A.Blip(
@@ -81,33 +82,30 @@ namespace CreateDocxFromDotx
                         }))
                 {
                     Embed = relationshipId,
-                    CompressionState =
-                        A.BlipCompressionValues.Print
+                    CompressionState = A.BlipCompressionValues.Print
                 },
-                new A.Stretch(new A.FillRectangle())
-            );
+                new A.Stretch(new A.FillRectangle()));
 
             var picShapeProperties = new PIC.ShapeProperties(
                 new A.Transform2D(
                     new A.Offset()
                     {
-                        X = 0L, Y = 0L
+                        X = 0L,
+                        Y = 0L
                     },
                     new A.Extents()
                     {
-                        Cx = 990000L, Cy = 792000L
+                        Cx = 990000L,
+                        Cy = 792000L
                     }),
                 new A.PresetGeometry(new A.AdjustValueList())
                 {
                     Preset = A.ShapeTypeValues.Rectangle
-                }
-            );
+                });
 
             var aGraphicData = new A.GraphicData(
                 new PIC.Picture(
-                    pictureProperties,
-                    picBlipFill,
-                    picShapeProperties))
+                    pictureProperties, picBlipFill, picShapeProperties))
             {
                 Uri = "http://schemas.openxmlformats.org/drawingml/2006/picture"
             };
@@ -115,7 +113,8 @@ namespace CreateDocxFromDotx
             var dwInline = new DW.Inline(
                 new DW.Extent()
                 {
-                    Cx = 990000L, Cy = 792000L
+                    Cx = 990000L,
+                    Cy = 792000L
                 },
                 new DW.EffectExtent()
                 {
@@ -134,20 +133,14 @@ namespace CreateDocxFromDotx
                     {
                         NoChangeAspect = true
                     }),
-                new A.Graphic(aGraphicData))
-            {
-                DistanceFromTop = 0U,
-                DistanceFromBottom = 0U,
-                DistanceFromLeft = 0U,
-                DistanceFromRight = 0U,
-                EditId = "50D07946"
-            };
+                new A.Graphic(aGraphicData));
 
             // Define the reference of the image.
             var element = new Drawing(dwInline);
 
             // Append the reference to body, the element should be in a Run.
-            wordDoc.MainDocumentPart.Document.Body.AppendChild(new Paragraph(new Run(element)));
+            wordDoc.MainDocumentPart.Document.Body.AppendChild(
+                new Paragraph(new Run(element)));
         }
 
         private static void InsertSimpleTable(DataTable dataTable, OpenXmlElement docTable)

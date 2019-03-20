@@ -67,12 +67,14 @@ namespace CreateDocxFromDotx
         {
             const long picSizeCx = 990000L + 990000L;
             const long picSizeCy = picSizeCx;
+            var name = $"Picture {_idInsertPicture}";
+            ++_idInsertPicture;
 
             var pictureProperties = new PIC.NonVisualPictureProperties(
                 new PIC.NonVisualDrawingProperties()
                 {
                     Id = (UInt32Value) 0U,
-                    Name = "New Bitmap Image.jpg"
+                    Name = name
                 },
                 new PIC.NonVisualPictureDrawingProperties());
 
@@ -129,7 +131,7 @@ namespace CreateDocxFromDotx
                 new DW.DocProperties()
                 {
                     Id = (UInt32Value) 1U,
-                    Name = "Picture 1"
+                    Name = name
                 },
                 new DW.NonVisualGraphicFrameDrawingProperties(
                     new A.GraphicFrameLocks()
@@ -227,5 +229,7 @@ namespace CreateDocxFromDotx
         private static readonly string SampleFolder = Path.Combine(Environment.CurrentDirectory, "Sample");
         private readonly string _destinationFile = Path.Combine(SampleFolder, "Doc.docx");
         private readonly string _sourceFile = Path.Combine(SampleFolder, "TemplateDoc.dotx");
+
+        private static long _idInsertPicture = 0;
     }
 }

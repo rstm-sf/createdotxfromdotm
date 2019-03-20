@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Data;
 using System.Diagnostics;
+using System.Drawing;
+using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using DocumentFormat.OpenXml;
@@ -53,14 +55,16 @@ namespace CreateDocxFromDotx
         public static void InsertAPicture(WordprocessingDocument document, string fileNamePic)
         {
             var mainPart = document.MainDocumentPart;
-            var imagePart = mainPart.AddImagePart(ImagePartType.Jpeg);
 
             using (var stream = new FileStream(fileNamePic, FileMode.Open))
             {
+                var image = Image.FromStream(stream);
+                var type = ImageFormatToImagePartType(image.RawFormat);
+                var imagePart = mainPart.AddImagePart(type);
+                stream.Position = 0;
                 imagePart.FeedData(stream);
+                AddImageToBody(document, mainPart.GetIdOfPart(imagePart));
             }
-
-            AddImageToBody(document, mainPart.GetIdOfPart(imagePart));
         }
 
         private static void AddImageToBody(WordprocessingDocument wordDoc, string relationshipId)
@@ -146,6 +150,46 @@ namespace CreateDocxFromDotx
             // Append the reference to body, the element should be in a Run.
             wordDoc.MainDocumentPart.Document.Body.AppendChild(
                 new Paragraph(new Run(element)));
+        }
+
+        private static ImagePartType ImageFormatToImagePartType(ImageFormat rawFormat)
+        {
+            if (ImageFormat.Jpeg.Equals(rawFormat))
+            {
+                return ImagePartType.Jpeg;
+            }
+            else if (ImageFormat.Png.Equals(rawFormat))
+            {
+                return ImagePartType.Png;
+            }
+            else if (ImageFormat.Gif.Equals(rawFormat))
+            {
+                return ImagePartType.Gif;
+            }
+            else if (ImageFormat.Bmp.Equals(rawFormat))
+            {
+                return ImagePartType.Bmp;
+            }
+            else if (ImageFormat.Emf.Equals(rawFormat))
+            {
+                return ImagePartType.Emf;
+            }
+            else if (ImageFormat.Icon.Equals(rawFormat))
+            {
+                return ImagePartType.Icon;
+            }
+            else if (ImageFormat.Tiff.Equals(rawFormat))
+            {
+                return ImagePartType.Tiff;
+            }
+            else if (ImageFormat.Wmf.Equals(rawFormat))
+            {
+                return ImagePartType.Wmf;
+            }
+            else
+            {
+                throw new InvalidCastException();
+            }
         }
 
         private static void InsertSimpleTable(DataTable dataTable, OpenXmlElement docTable)

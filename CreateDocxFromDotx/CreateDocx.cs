@@ -18,6 +18,15 @@ namespace CreateDocxFromDotx
     {
         public CreateDocx()
         {
+            var count = Directory.GetFiles(
+                SampleFolder,
+                $"{_fileName}*.docx", 
+                SearchOption.TopDirectoryOnly).Length;
+            _destinationFile = Path.Combine(
+                SampleFolder,
+                count == 0
+                    ? $"{_fileName}.docx"
+                    : $"{_fileName} ({count + 1}).docx");
             try
             {
                 File.Copy(_sourceFile, _destinationFile, true);
@@ -309,7 +318,8 @@ namespace CreateDocxFromDotx
         }
 
         private static readonly string SampleFolder = Path.Combine(Environment.CurrentDirectory, "Sample");
-        private readonly string _destinationFile = Path.Combine(SampleFolder, "Doc.docx");
+        private readonly string _fileName = "Doc";
+        private readonly string _destinationFile;
         private readonly string _sourceFile = Path.Combine(SampleFolder, "TemplateDoc.dotx");
 
         private static long _idInsertPicture = 0;

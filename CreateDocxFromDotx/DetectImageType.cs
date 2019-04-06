@@ -15,9 +15,6 @@ namespace CreateDocxFromDotx
         private static readonly byte[] Png = Utility.ConvertHexStringToByteArray(string.Concat(
             "89", "50", "4E", "47", "0D", "0A", "1A", "0A"));
 
-        private static readonly byte[] Jpeg = Utility.ConvertHexStringToByteArray(string.Concat(
-            "FF", "D8"));
-
         private static readonly byte[] Tiff = Utility.ConvertHexStringToByteArray(string.Concat(
             "49", "20", "49"));
         private static readonly byte[] Tiff2 = Utility.ConvertHexStringToByteArray(string.Concat(
@@ -27,12 +24,18 @@ namespace CreateDocxFromDotx
         private static readonly byte[] Tiff4 = Utility.ConvertHexStringToByteArray(string.Concat(
             "4D", "4D", "00", "2B")); // BigTIFF
 
+        private static readonly byte[] Icon = Utility.ConvertHexStringToByteArray(string.Concat(
+            "00", "00", "01", "00")); // Windows icon file
+
+        private static readonly byte[] Jpeg = Utility.ConvertHexStringToByteArray(string.Concat(
+            "FF", "D8"));
+
         public static ImageFileType GetImageType(Stream stream)
         {
             if (stream == null)
                 throw new ArgumentNullException(nameof(stream));
 
-            var buffer = new byte[4];
+            var buffer = new byte[8];
             stream.Read(buffer, 0, buffer.Length);
             stream.Position = 0;
             return GetImageType(buffer);
@@ -62,6 +65,10 @@ namespace CreateDocxFromDotx
                      || Tiff4.SequenceEqual(buffer.Take(Tiff4.Length)))
             {
                 return ImageFileType.Tiff;
+            }
+            else if (Icon.SequenceEqual(buffer.Take(Icon.Length)))
+            {
+                return ImageFileType.Icon;
             }
             else
             {

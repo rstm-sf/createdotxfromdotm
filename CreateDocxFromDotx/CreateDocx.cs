@@ -20,39 +20,33 @@ namespace CreateDocxFromDotx
         {
             var count = Directory.GetFiles(
                 SampleFolder,
-                $"{_fileName}*.docx", 
+                $"{FileName}*.docx", 
                 SearchOption.TopDirectoryOnly).Length;
             _destinationFile = Path.Combine(
                 SampleFolder,
                 count == 0
-                    ? $"{_fileName}.docx"
-                    : $"{_fileName} ({count + 1}).docx");
-            try
+                    ? $"{FileName}.docx"
+                    : $"{FileName} ({count + 1}).docx");
+
+            File.Copy(_sourceFile, _destinationFile, true);
+            using (var document = WordprocessingDocument.Open(_destinationFile, true))
             {
-                File.Copy(_sourceFile, _destinationFile, true);
-                using (var document = WordprocessingDocument.Open(_destinationFile, true))
-                {
-                    document.ChangeDocumentType(WordprocessingDocumentType.Document);
+                document.ChangeDocumentType(WordprocessingDocumentType.Document);
 
-                    var docTables = document.MainDocumentPart.Document.Body.Elements<Table>().ToList();
+                var docTables = document.MainDocumentPart.Document.Body.Elements<Table>().ToList();
 
-                    var dataTable = Utility.CreateTestDataTable("TestTable");
-                    InsertSimpleTable(dataTable, docTables[0]);
+                var dataTable = Utility.CreateTestDataTable("TestTable");
+                InsertSimpleTable(dataTable, docTables[0]);
 
-                    dataTable = Utility.CreateTestDataTableWith5Column("TestTableWith5");
-                    InsertSimpleTableWithAddColumn(dataTable, docTables[1]);
+                dataTable = Utility.CreateTestDataTableWith5Column("TestTableWith5");
+                InsertSimpleTableWithAddColumn(dataTable, docTables[1]);
 
-                    InsertAPicture(document, Path.Combine(SampleFolder, "picture1.jpg"));
-                    InsertAPicture(document, Path.Combine(SampleFolder, "picture1.jpg"));
-                    InsertAPicture(document, Path.Combine(SampleFolder, "picture1.jpg"));
+                InsertAPicture(document, Path.Combine(SampleFolder, "picture1.jpg"));
+                InsertAPicture(document, Path.Combine(SampleFolder, "picture1.jpg"));
+                InsertAPicture(document, Path.Combine(SampleFolder, "picture1.jpg"));
 
-                    document.Save();
-                    Console.WriteLine("Document generated at " + _destinationFile);
-                }
-            }
-            catch (Exception e)
-            {
-                throw new Exception(e.Message);
+                document.Save();
+                Console.WriteLine("Document generated at " + _destinationFile);
             }
         }
 
@@ -241,66 +235,52 @@ namespace CreateDocxFromDotx
 
         private static void InsertSimpleTable(DataTable dataTable, OpenXmlElement docTable)
         {
-            try
+            var docRows = docTable.Elements<TableRow>();
+            var patternRow = (TableRow) docRows.Last().Clone();
+            docRows.Last().Remove();
+
+            for (var rIdx = 0; rIdx < dataTable.Rows.Count; ++rIdx)
             {
-                var docRows = docTable.Descendants<TableRow>().ToList();
-                var patternRow = (TableRow) docRows.Last().Clone();
-                docRows.Last().Remove();
+                var docRow = (TableRow) patternRow.Clone();
 
-                for (var rIdx = 0; rIdx < dataTable.Rows.Count; ++rIdx)
-                {
-                    var docRow = (TableRow) patternRow.Clone();
+                var docCells = docRow.Elements<TableCell>().ToList();
+                for (var cIdx = 0; cIdx < dataTable.Columns.Count; ++cIdx)
+                    ReplaceText(docCells[cIdx], dataTable.Rows[rIdx][cIdx]);
 
-                    var docCells = docRow.Descendants<TableCell>().ToList();
-                    for (var cIdx = 0; cIdx < dataTable.Columns.Count; ++cIdx)
-                        ReplaceText(docCells[cIdx], dataTable.Rows[rIdx][cIdx]);
-
-                    docTable.Descendants<TableRow>().ToList().Last().InsertAfterSelf(docRow);
-                }
-            }
-            catch (Exception e)
-            {
-                throw new Exception(e.Message);
+                docRows.Last().InsertAfterSelf(docRow);
             }
         }
 
         private static void InsertSimpleTableWithAddColumn(DataTable dataTable, OpenXmlElement docTable)
         {
-            try
+            var docRows = docTable.Elements<TableRow>();
+            var patternRow = (TableRow)docRows.Last().Clone();
+            docRows.Last().Remove();
+
+            var docRow = docTable.Elements<TableRow>().Last();
+            var docCells = docRow.Elements<TableCell>();
+            var midCell = (TableCell)docCells.ElementAt(1).Clone();
+            ReplaceText(docCells.ElementAt(1), dataTable.Columns[1]);
+            for (var cIdx = 2; cIdx < dataTable.Columns.Count - 1; ++cIdx)
             {
-                var docRows = docTable.Descendants<TableRow>().ToList();
-                var patternRow = (TableRow)docRows.Last().Clone();
-                docRows.Last().Remove();
+                var docCell = (TableCell)midCell.Clone();
+                ReplaceText(docCell, dataTable.Columns[cIdx]);
+                docCells.ElementAt(cIdx - 1).InsertAfterSelf(docCell);
 
-                var docRow = docTable.Descendants<TableRow>().ToList().Last();
-                var docCells = docRow.Descendants<TableCell>().ToList();
-                var midCell = (TableCell)docCells[1].Clone();
-                ReplaceText(docCells[1], dataTable.Columns[1]);
-                for (var cIdx = 2; cIdx < dataTable.Columns.Count - 1; ++cIdx)
-                {
-                    var docCell = (TableCell)midCell.Clone();
-                    ReplaceText(docCell, dataTable.Columns[cIdx]);
-                    docRow.Descendants<TableCell>().ToList()[cIdx - 1].InsertAfterSelf(docCell);
-
-                    docCell = (TableCell) patternRow.Descendants<TableCell>().ToList()[1].Clone();
-                    patternRow.Descendants<TableCell>().ToList()[cIdx - 1].InsertAfterSelf(docCell);
-                }
-                ReplaceText(docCells.Last(), dataTable.Columns[dataTable.Columns.Count - 1]);
-
-                for (var rIdx = 0; rIdx < dataTable.Rows.Count; ++rIdx)
-                {
-                    docRow = (TableRow)patternRow.Clone();
-
-                    docCells = docRow.Descendants<TableCell>().ToList();
-                    for (var cIdx = 0; cIdx < dataTable.Columns.Count; ++cIdx)
-                        ReplaceText(docCells[cIdx], dataTable.Rows[rIdx][cIdx]);
-
-                    docTable.Descendants<TableRow>().ToList().Last().InsertAfterSelf(docRow);
-                }
+                docCell = (TableCell) patternRow.Elements<TableCell>().ElementAt(1).Clone();
+                patternRow.Elements<TableCell>().ElementAt(cIdx - 1).InsertAfterSelf(docCell);
             }
-            catch (Exception e)
+            ReplaceText(docCells.Last(), dataTable.Columns[dataTable.Columns.Count - 1]);
+
+            for (var rIdx = 0; rIdx < dataTable.Rows.Count; ++rIdx)
             {
-                throw new Exception(e.Message);
+                docRow = (TableRow)patternRow.Clone();
+
+                docCells = docRow.Elements<TableCell>().ToList();
+                for (var cIdx = 0; cIdx < dataTable.Columns.Count; ++cIdx)
+                    ReplaceText(docCells.ElementAt(cIdx), dataTable.Rows[rIdx][cIdx]);
+
+                docRows.Last().InsertAfterSelf(docRow);
             }
         }
 
@@ -318,7 +298,7 @@ namespace CreateDocxFromDotx
         }
 
         private static readonly string SampleFolder = Path.Combine(Environment.CurrentDirectory, "Sample");
-        private readonly string _fileName = "Doc";
+        private const string FileName = "Doc";
         private readonly string _destinationFile;
         private readonly string _sourceFile = Path.Combine(SampleFolder, "TemplateDoc.dotx");
 

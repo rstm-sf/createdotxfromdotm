@@ -41,6 +41,9 @@ namespace CreateDocxFromDotx
         private static readonly byte[] Jpeg = Utility.ConvertHexStringToByteArray(string.Concat(
             "FF", "D8"));
 
+        private static readonly byte[] Emf = Utility.ConvertHexStringToByteArray(string.Concat(
+            "01", "00", "00", "00"));
+
         public static ImageFileType GetImageType(Stream stream)
         {
             if (stream == null)
@@ -69,6 +72,10 @@ namespace CreateDocxFromDotx
             else if (Bmp.SequenceEqual(buffer.Take(Bmp.Length)))
             {
                 return ImageFileType.Bmp;
+            }
+            else if (Emf.SequenceEqual(buffer.Take(Emf.Length)))
+            {
+                return ImageFileType.Emf;
             }
             else if (Tiff.SequenceEqual(buffer.Take(Tiff.Length))
                      || Tiff2.SequenceEqual(buffer.Take(Tiff2.Length))

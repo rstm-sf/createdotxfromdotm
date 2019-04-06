@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Data;
 using System.Diagnostics;
-using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using DocumentFormat.OpenXml;
@@ -152,46 +151,6 @@ namespace CreateDocxFromDotx
                 new Paragraph(new Run(element)));
         }
 
-        private static ImagePartType ImageFormatToImagePartType(ImageFormat rawFormat)
-        {
-            if (ImageFormat.Jpeg.Equals(rawFormat))
-            {
-                return ImagePartType.Jpeg;
-            }
-            else if (ImageFormat.Png.Equals(rawFormat))
-            {
-                return ImagePartType.Png;
-            }
-            else if (ImageFormat.Gif.Equals(rawFormat))
-            {
-                return ImagePartType.Gif;
-            }
-            else if (ImageFormat.Bmp.Equals(rawFormat))
-            {
-                return ImagePartType.Bmp;
-            }
-            else if (ImageFormat.Emf.Equals(rawFormat))
-            {
-                return ImagePartType.Emf;
-            }
-            else if (ImageFormat.Icon.Equals(rawFormat))
-            {
-                return ImagePartType.Icon;
-            }
-            else if (ImageFormat.Tiff.Equals(rawFormat))
-            {
-                return ImagePartType.Tiff;
-            }
-            else if (ImageFormat.Wmf.Equals(rawFormat))
-            {
-                return ImagePartType.Wmf;
-            }
-            else
-            {
-                throw new InvalidCastException();
-            }
-        }
-
         private static ImagePartType GetImagePartType(Stream stream)
         {
             var type = DetectImageType.GetImageType(stream);
@@ -251,15 +210,10 @@ namespace CreateDocxFromDotx
 
         private static void ReplaceText(OpenXmlElement tCell, object dCell)
         {
-            try
-            {
-                var first = tCell.Descendants<Text>().FirstOrDefault();
-                first.Text = dCell.ToString();
-            }
-            catch (Exception e)
-            {
-                throw new Exception(e.Message);
-            }
+            var texts = tCell.Descendants<Text>().ToList();
+            texts.First().Text = dCell.ToString();
+            for (var i = 1; i < texts.Count; ++i)
+                texts[i].Remove();
         }
 
         private static readonly string SampleFolder = Path.Combine(Environment.CurrentDirectory, "Sample");

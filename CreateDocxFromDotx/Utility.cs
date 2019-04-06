@@ -1,4 +1,7 @@
-﻿using System.Data;
+﻿using System;
+using DocumentFormat.OpenXml.Packaging;
+using System.Data;
+using System.Drawing.Imaging;
 
 namespace CreateDocxFromDotx
 {
@@ -54,6 +57,47 @@ namespace CreateDocxFromDotx
 
             table.AcceptChanges();
             return table;
+        }
+
+
+        private static ImagePartType ImageFormatToImagePartType(ImageFormat rawFormat)
+        {
+            if (ImageFormat.Jpeg.Equals(rawFormat))
+            {
+                return ImagePartType.Jpeg;
+            }
+            else if (ImageFormat.Png.Equals(rawFormat))
+            {
+                return ImagePartType.Png;
+            }
+            else if (ImageFormat.Gif.Equals(rawFormat))
+            {
+                return ImagePartType.Gif;
+            }
+            else if (ImageFormat.Bmp.Equals(rawFormat))
+            {
+                return ImagePartType.Bmp;
+            }
+            else if (ImageFormat.Emf.Equals(rawFormat))
+            {
+                return ImagePartType.Emf;
+            }
+            else if (ImageFormat.Icon.Equals(rawFormat))
+            {
+                return ImagePartType.Icon;
+            }
+            else if (ImageFormat.Tiff.Equals(rawFormat))
+            {
+                return ImagePartType.Tiff;
+            }
+            else if (ImageFormat.Wmf.Equals(rawFormat))
+            {
+                return ImagePartType.Wmf;
+            }
+            else
+            {
+                throw new InvalidCastException();
+            }
         }
     }
 }

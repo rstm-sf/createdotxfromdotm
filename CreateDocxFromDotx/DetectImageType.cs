@@ -44,6 +44,11 @@ namespace CreateDocxFromDotx
         private static readonly byte[] Emf = Utility.ConvertHexStringToByteArray(string.Concat(
             "01", "00", "00", "00"));
 
+        private static readonly byte[] Wmf = Utility.ConvertHexStringToByteArray(string.Concat(
+            "D7", "CD", "C6", "9A"));  // Windows graphics metafile
+        private static readonly byte[] Wmf2 = Utility.ConvertHexStringToByteArray(string.Concat(
+            "01", "00", "09", "00", "00", "03"));  // Windows Metadata file (Win 3.x format)
+
         public static ImageFileType GetImageType(Stream stream)
         {
             if (stream == null)
@@ -76,6 +81,11 @@ namespace CreateDocxFromDotx
             else if (Emf.SequenceEqual(buffer.Take(Emf.Length)))
             {
                 return ImageFileType.Emf;
+            }
+            else if (Wmf.SequenceEqual(buffer.Take(Wmf.Length))
+                     || Wmf2.SequenceEqual(buffer.Take(Wmf2.Length)))
+            {
+                return ImageFileType.Wmf;
             }
             else if (Tiff.SequenceEqual(buffer.Take(Tiff.Length))
                      || Tiff2.SequenceEqual(buffer.Take(Tiff2.Length))

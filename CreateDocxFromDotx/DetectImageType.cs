@@ -27,6 +27,17 @@ namespace CreateDocxFromDotx
         private static readonly byte[] Icon = Utility.ConvertHexStringToByteArray(string.Concat(
             "00", "00", "01", "00")); // Windows icon file
 
+        private static readonly byte[] Pcx0 = Utility.ConvertHexStringToByteArray(string.Concat(
+            "0A", "00", "01")); // Version 00
+        private static readonly byte[] Pcx2 = Utility.ConvertHexStringToByteArray(string.Concat(
+            "0A", "02", "01")); // Version 02
+        private static readonly byte[] Pcx3 = Utility.ConvertHexStringToByteArray(string.Concat(
+            "0A", "03", "01")); // Version 03
+        private static readonly byte[] Pcx4 = Utility.ConvertHexStringToByteArray(string.Concat(
+            "0A", "04", "01")); // Version 04
+        private static readonly byte[] Pcx5 = Utility.ConvertHexStringToByteArray(string.Concat(
+            "0A", "05", "01")); // Version 05
+
         private static readonly byte[] Jpeg = Utility.ConvertHexStringToByteArray(string.Concat(
             "FF", "D8"));
 
@@ -69,6 +80,14 @@ namespace CreateDocxFromDotx
             else if (Icon.SequenceEqual(buffer.Take(Icon.Length)))
             {
                 return ImageFileType.Icon;
+            }
+            else if (Pcx0.SequenceEqual(buffer.Take(Pcx0.Length))
+                     || Pcx2.SequenceEqual(buffer.Take(Pcx2.Length))
+                     || Pcx3.SequenceEqual(buffer.Take(Pcx3.Length))
+                     || Pcx4.SequenceEqual(buffer.Take(Pcx4.Length))
+                     || Pcx5.SequenceEqual(buffer.Take(Pcx5.Length)))
+            {
+                return ImageFileType.Pcx;
             }
             else
             {

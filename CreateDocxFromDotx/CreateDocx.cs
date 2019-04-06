@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Data;
 using System.Diagnostics;
-using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
@@ -195,42 +194,8 @@ namespace CreateDocxFromDotx
 
         private static ImagePartType GetImagePartType(Stream stream)
         {
-            var bmp = System.Text.Encoding.ASCII.GetBytes("BM");     // BMP
-            var gif = System.Text.Encoding.ASCII.GetBytes("GIF");    // GIF
-            var png = new byte[] { 137, 80, 78, 71 };    // PNG
-            var tiff = new byte[] { 73, 73, 42 };         // TIFF
-            var tiff2 = new byte[] { 77, 77, 42 };         // TIFF
-            var jpeg = new byte[] { 255, 216, 255, 224 }; // jpeg
-            var jpeg2 = new byte[] { 255, 216, 255, 225 }; // jpeg canon
-
-            var buffer = new byte[4];
-            stream.Read(buffer, 0, buffer.Length);
-            stream.Position = 0;
-
-            if (jpeg.SequenceEqual(buffer.Take(jpeg.Length)) || jpeg2.SequenceEqual(buffer.Take(jpeg2.Length)))
-            {
-                return ImagePartType.Jpeg;
-            }
-            else if (png.SequenceEqual(buffer.Take(png.Length)))
-            {
-                return ImagePartType.Png;
-            }
-            else if (gif.SequenceEqual(buffer.Take(gif.Length)))
-            {
-                return ImagePartType.Gif;
-            }
-            else if (bmp.SequenceEqual(buffer.Take(bmp.Length)))
-            {
-                return ImagePartType.Bmp;
-            }
-            else if (tiff.SequenceEqual(buffer.Take(tiff.Length)) || tiff2.SequenceEqual(buffer.Take(tiff2.Length)))
-            {
-                return ImagePartType.Tiff;
-            }
-            else
-            {
-                throw new InvalidCastException();
-            }
+            var type = DetectImageType.GetImageType(stream);
+            return (ImagePartType) type;
         }
 
         private static void InsertSimpleTable(DataTable dataTable, OpenXmlElement docTable)

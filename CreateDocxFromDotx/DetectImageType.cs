@@ -10,8 +10,15 @@ namespace CreateDocxFromDotx
         private static readonly byte[] Gif = System.Text.Encoding.ASCII.GetBytes("GIF");
         private static readonly byte[] Png = { 137, 80, 78, 71 };
         private static readonly byte[] Jpeg = { 255, 216, 255 };
-        private static readonly byte[] Tiff = { 73, 73, 42 };
-        private static readonly byte[] Tiff2 = { 77, 77, 42 };
+
+        private static readonly byte[] Tiff = Utility.ConvertHexStringToByteArray(string.Concat(
+            "49", "20", "49"));
+        private static readonly byte[] Tiff2 = Utility.ConvertHexStringToByteArray(string.Concat(
+            "49", "49", "2A", "00")); // little endian
+        private static readonly byte[] Tiff3 = Utility.ConvertHexStringToByteArray(string.Concat(
+            "4D", "4D", "00", "2A")); // big endian
+        private static readonly byte[] Tiff4 = Utility.ConvertHexStringToByteArray(string.Concat(
+            "4D", "4D", "00", "2B")); // BigTIFF
 
         public static ImageFileType GetImageType(Stream stream)
         {
@@ -42,7 +49,10 @@ namespace CreateDocxFromDotx
             {
                 return ImageFileType.Bmp;
             }
-            else if (Tiff.SequenceEqual(buffer.Take(Tiff.Length)) || Tiff2.SequenceEqual(buffer.Take(Tiff2.Length)))
+            else if (Tiff.SequenceEqual(buffer.Take(Tiff.Length))
+                     || Tiff2.SequenceEqual(buffer.Take(Tiff2.Length))
+                     || Tiff3.SequenceEqual(buffer.Take(Tiff3.Length))
+                     || Tiff4.SequenceEqual(buffer.Take(Tiff4.Length)))
             {
                 return ImageFileType.Tiff;
             }

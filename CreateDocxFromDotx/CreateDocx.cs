@@ -194,7 +194,7 @@ namespace CreateDocxFromDotx
                 docCell = (TableCell) patternRow.Elements<TableCell>().ElementAt(1).Clone();
                 patternRow.Elements<TableCell>().ElementAt(cIdx - 1).InsertAfterSelf(docCell);
             }
-            ReplaceText(docCells.Last(), dataTable.Columns[dataTable.Columns.Count - 1]);
+            ReplaceText(docCells.Last(), dataTable.Columns[dataTable.Columns.Count - 1].Caption);
 
             for (var rIdx = 0; rIdx < dataTable.Rows.Count; ++rIdx)
             {

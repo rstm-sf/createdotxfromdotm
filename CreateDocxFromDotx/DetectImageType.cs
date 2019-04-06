@@ -62,6 +62,9 @@ namespace CreateDocxFromDotx
 
         public static ImageFileType GetImageType(byte[] buffer)
         {
+            if (buffer == null)
+                throw new ArgumentNullException(nameof(buffer));
+
             if (Jpeg.SequenceEqual(buffer.Take(Jpeg.Length)))
             {
                 return ImageFileType.Jpeg;

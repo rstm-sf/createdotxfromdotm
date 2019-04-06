@@ -6,10 +6,17 @@ namespace CreateDocxFromDotx
 {
     public static class DetectImageType
     {
-        private static readonly byte[] Bmp = System.Text.Encoding.ASCII.GetBytes("BM");
-        private static readonly byte[] Gif = System.Text.Encoding.ASCII.GetBytes("GIF");
-        private static readonly byte[] Png = { 137, 80, 78, 71 };
-        private static readonly byte[] Jpeg = { 255, 216, 255 };
+        private static readonly byte[] Bmp = Utility.ConvertHexStringToByteArray(string.Concat(
+            "42", "4D")); // BM
+
+        private static readonly byte[] Gif = Utility.ConvertHexStringToByteArray(string.Concat(
+            "47", "49", "46", "38")); // first 4 bytes of GIF87a or GIF89a
+
+        private static readonly byte[] Png = Utility.ConvertHexStringToByteArray(string.Concat(
+            "89", "50", "4E", "47", "0D", "0A", "1A", "0A"));
+
+        private static readonly byte[] Jpeg = Utility.ConvertHexStringToByteArray(string.Concat(
+            "FF", "D8"));
 
         private static readonly byte[] Tiff = Utility.ConvertHexStringToByteArray(string.Concat(
             "49", "20", "49"));
